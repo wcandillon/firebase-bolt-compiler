@@ -1,0 +1,25 @@
+{
+  "name": "firebase-bolt-compiler",
+  "version": "1.0.0",
+  "description": "Compiles Firebase Bolt files to TypeScript, Flow, & more",
+  "main": "build/index.js",
+  "typings": "build/index.d.ts",
+  "repository": "https://github.com/wcandillon/firebase-bolt-compiler",
+  "author": "William Candillon <wcandillon@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
+  },
+  "files": ["build"],
+  "firebase-bolt-compiler": {
+    "firebase-bolt-compiler": "./bin/firebase-bolt-compiler"
+  },
+  "scripts": {
+    "lint": "tslint --project tsconfig.json",
+    "build": "tsc --pretty"
+  },
+  "dependencies": {
+    "update-notifier": "^2.2.0"
+  }
+}
