@@ -29,7 +29,11 @@ export default class TypeScriptGenerator {
                     this.atomicTypes[name] = this.serializeTypeName(type.name);
                 }
             }
-        )
+        );
+    }
+
+    generate(): string {
+        return _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema)).join("\n\n");
     }
 
     private serializeTypeName(name: string): string {
@@ -53,7 +57,7 @@ export default class TypeScriptGenerator {
     }
 
     private serializeUnionType(type: ExpUnionType): string {
-        return type.types.map(type => this.serialize(type)).join(" | ");
+        return type.types.map(t => this.serialize(t)).join(" | ");
     }
 
     private serializeGenericType(type: ExpGenericType): string {
@@ -109,9 +113,5 @@ ${
         } else {
             return "";
         }
-    }
-
-    generate(): string {
-        return _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema)).join("\n\n");
     }
 }
