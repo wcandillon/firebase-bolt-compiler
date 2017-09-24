@@ -63,7 +63,7 @@ const derives = (schema: Schema): string =>  {
 };
 
 export default function(schema: { [name: string]: Schema }): string {
-        const header = `type Map<K extends string, V> = { K: V };`;
+        const header = `type Map<K extends String, V> = { K: V };`;
         return header + "\n" + _.map(schema, (type, name) => `
 export interface ${name} ${derives(type)}{
 ${_.map(type.properties, (property, propertyName) => `    ${propertyName}: ${serialize(property)};
