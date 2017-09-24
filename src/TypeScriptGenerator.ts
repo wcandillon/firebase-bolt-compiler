@@ -7,7 +7,7 @@ import { ExpType, ExpGenericType, ExpUnionType, ExpSimpleType, Schema } from "./
         return schema.params !== undefined && schema.params.length > 0;
     }
  */
-const BuiltinMapping: { [name: string]: string } = {
+const AtomicTypes: { [name: string]: string } = {
     Any: "any",
     Boolean: "boolean",
     Number: "number",
@@ -28,7 +28,7 @@ const serialize = (type: ExpType): string => {
 };
 /* tslint:enable:no-use-before-declare */
 
-const serializeTypeName = (name: string) => BuiltinMapping[name] || name;
+const serializeTypeName = (name: string) => AtomicTypes[name] || name;
 
 const serializeSimpleType = (type: ExpSimpleType) => serializeTypeName(type.name);
 
@@ -37,7 +37,7 @@ const serializeUnionType = (type: ExpUnionType) => type.types.map(serialize).joi
 const serializeGenericType = (type: ExpGenericType) =>
     type.name === "Map"
         ?
-            `{ [key: ${serialize(type.params[0])}]: ${serialize(type.params[1])} }`
+            `{ [key: string]: ${serialize(type.params[1])} }`
         :
             `${serializeTypeName(type.name)}<${type.params.map(serialize).join(", ")}>`;
 
@@ -53,6 +53,11 @@ const serializeRef = (type: ExpType): string => {
         return (type as ExpSimpleType).name;
     }
 };
+
+const derivesFromMap = (type: ExpGenericType): boolean => type.name === "Map";
+
+const derivesFromAtomic = (type: ExpSimpleType): boolean => AtomicTypes[type.name] !== undefined && type.name !== "Object";
+
 const derives = (schema: Schema): string =>  {
     const type = serializeRef(schema.derivedFrom);
     if (type !== "Object") {
@@ -62,11 +67,18 @@ const derives = (schema: Schema): string =>  {
     }
 };
 
-export default function(schema: { [name: string]: Schema }): string {
-        const header = `type Map<K extends String, V> = { K: V };`;
-        return header + "\n" + _.map(schema, (type, name) => `
-export interface ${name} ${derives(type)}{
-${_.map(type.properties, (property, propertyName) => `    ${propertyName}: ${serialize(property)};
-`).join("")} 
-}`).join("");
+const serializeSchema = (name: string, schema: Schema): string => {
+    if (derivesFromMap(schema.derivedFrom as ExpGenericType)) {
+        return `type ${name} = ${serializeGenericType(schema.derivedFrom as ExpGenericType)};`
+    } else if (!derivesFromAtomic(schema.derivedFrom as ExpSimpleType)) {
+        return `export interface ${name} ${derives(schema)}{
+${_.map(schema.properties, (property, propertyName) => `    ${propertyName}: ${serialize(property)};`).join("\n")}
+}`;
+    } else {
+        return "";
+    }
+};
+
+export default function(schemas: { [name: string]: Schema }): string {
+        return _.map(schemas, (schema, name) => serializeSchema(name, schema)).join("\n\n");
 }
