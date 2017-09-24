@@ -1,14 +1,13 @@
 import * as _ from "lodash";
 
-import { ExpType, ExpGenericType, ExpUnionType, ExpSimpleType, Schema } from "./AST";
+import { Path, Schemas, ExpType, ExpGenericType, ExpUnionType, ExpSimpleType, Schema } from "firebase-bolt";
 
 type NamedType = ExpSimpleType | ExpGenericType;
-
-export type Schemas = { [name: string]: Schema };
 
 export default class TypeScriptGenerator {
 
     private schemas: Schemas;
+    private paths: Path[];
 
     private atomicTypes: { [type: string]: string } = {
         Any: "any",
@@ -19,8 +18,9 @@ export default class TypeScriptGenerator {
         String: "string"
     };
 
-    constructor(schemas: Schemas) {
+    constructor(schemas: Schemas, paths: Path[]) {
         this.schemas = schemas;
+        this.paths = paths;
         _.forEach(
             schemas,
             (schema, name) => {
@@ -33,7 +33,19 @@ export default class TypeScriptGenerator {
     }
 
     generate(): string {
-        return _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema)).join("\n\n");
+        const paths = this.paths.map(path => this.serializePath(path)).join("\n\n") + "\n\n";
+        const types = _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema)).join("\n\n");
+        return paths + types;
+    }
+
+    private serializePath(path: Path): string {
+        const params = path.template.parts
+            .map(part => part.variable ? part.variable : "")
+            .filter(part => part !== "")
+            .join(", ");
+        return `export function ${_.camelCase(`get ${path.template.parts[0].label}`)}(${params}) {
+    return \`${path.template.parts.map(p => p.variable ? `\${${p.variable}}` : p.label).join("/")}\`;
+}`;
     }
 
     private serializeTypeName(name: string): string {

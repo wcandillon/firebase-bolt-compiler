@@ -16,8 +16,8 @@ getStdin()
         if (!source) {
             throw new Error("No input file.");
         }
-        const {schema} = bolt.parse(source);
-        const generator = new TypeScriptGenerator(schema);
+        const {schema, paths} = bolt.parse(source);
+        const generator = new TypeScriptGenerator(schema, paths);
         process.stdout.write(generator.generate());
     })
     .catch(error => process.stderr.write(error + "\n"))
