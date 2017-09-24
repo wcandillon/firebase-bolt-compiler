@@ -37,7 +37,7 @@ jobs:
       - run: yarn lint
       - run: yarn build
       - deploy:
-          name: Firebase Deployment
+          name: Release Package
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               yarn build
