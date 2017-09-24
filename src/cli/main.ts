@@ -2,7 +2,7 @@ import * as program from "commander";
 import * as getStdin from "get-stdin";
 import * as bolt from "firebase-bolt";
 
-import Template from "../ts/Template";
+import generateTs from "../TypeScriptGenerator";
 
 const pkg = require("../../package.json");
 
@@ -11,14 +11,13 @@ program
     .parse(process.argv)
 ;
 
-
 getStdin()
     .then(source => {
         if (!source) {
             throw new Error("No input file.");
         }
         const {schema} = bolt.parse(source);
-        console.log(Template.get(schema));
+        process.stdout.write(generateTs(schema) + "\n");
     })
-    .catch(error => console.log(error));
+    .catch(error => process.stderr.write(error + "\n"))
 ;
