@@ -41,5 +41,5 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               yarn build
-              yarn release
+              yarn release || true
             fi
