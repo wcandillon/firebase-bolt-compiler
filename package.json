@@ -23,7 +23,8 @@
     "blaze"
   ],
   "files": [
-    "build"
+    "build",
+    "bin"
   ],
   "bin": {
     "firebase-bolt-compiler": "./bin/firebase-bolt-compiler"
