@@ -34,7 +34,9 @@ export default class TypeScriptGenerator {
 
     generate(): string {
         const paths = this.paths.map(path => this.serializePath(path)).join("\n\n") + "\n\n";
-        const types = _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema)).join("\n\n");
+        const types = _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema))
+            .join("\n\n")
+            .trim();
         return paths + types;
     }
 
