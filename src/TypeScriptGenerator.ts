@@ -40,7 +40,7 @@ export default class TypeScriptGenerator {
 
     private serializePath(path: Path): string {
         const params = path.template.parts
-            .map(part => part.variable ? part.variable : "")
+            .map(part => part.variable ? `${part.variable}: string` : "")
             .filter(part => part !== "")
             .join(", ");
         return `export function ${_.camelCase(`get ${path.template.parts[0].label}`)}(${params}) {
