@@ -56,7 +56,8 @@ const serializeRef = (type: ExpType): string => {
 
 const derivesFromMap = (type: ExpGenericType): boolean => type.name === "Map";
 
-const derivesFromAtomic = (type: ExpSimpleType): boolean => AtomicTypes[type.name] !== undefined && type.name !== "Object";
+const derivesFromAtomic = (type: ExpSimpleType): boolean =>
+    AtomicTypes[type.name] !== undefined && type.name !== "Object";
 
 const derives = (schema: Schema): string =>  {
     const type = serializeRef(schema.derivedFrom);
@@ -69,10 +70,14 @@ const derives = (schema: Schema): string =>  {
 
 const serializeSchema = (name: string, schema: Schema): string => {
     if (derivesFromMap(schema.derivedFrom as ExpGenericType)) {
-        return `type ${name} = ${serializeGenericType(schema.derivedFrom as ExpGenericType)};`
+        return `type ${name} = ${serializeGenericType(schema.derivedFrom as ExpGenericType)};`;
     } else if (!derivesFromAtomic(schema.derivedFrom as ExpSimpleType)) {
         return `export interface ${name} ${derives(schema)}{
-${_.map(schema.properties, (property, propertyName) => `    ${propertyName}: ${serialize(property)};`).join("\n")}
+${
+    _.map(
+        schema.properties, 
+        (property, propertyName) => `    ${propertyName}: ${serialize(property)};`).join("\n")
+}
 }`;
     } else {
         return "";
