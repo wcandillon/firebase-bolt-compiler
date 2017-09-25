@@ -33,19 +33,21 @@ export default class TypeScriptGenerator {
     }
 
     generate(): string {
-        const paths = this.paths.map(path => this.serializePath(path)).join("\n\n") + "\n\n";
+        // const paths = this.paths.map(path => this.serializePath(path)).join("\n\n") + "\n\n";
         const types = _.map(this.schemas, (schema, name) => this.serializeSchema(name, schema))
             .join("\n\n")
             .trim();
-        return paths + types;
+        // return paths + types;
+        return types;
     }
 
     private serializePath(path: Path): string {
+        const methodName = _.camelCase(`get ${path.template.parts[0].label}`);
         const params = path.template.parts
             .map(part => part.variable ? `${part.variable}: string` : "")
             .filter(part => part !== "")
             .join(", ");
-        return `export function ${_.camelCase(`get ${path.template.parts[0].label}`)}(${params}) {
+        return `export function ${methodName}(${params}) {
     return \`${path.template.parts.map(p => p.variable ? `\${${p.variable}}` : p.label).join("/")}\`;
 }`;
     }
