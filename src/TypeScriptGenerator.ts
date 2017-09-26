@@ -13,7 +13,7 @@ export default class TypeScriptGenerator {
         Any: "any",
         Boolean: "boolean",
         Number: "number",
-        Null: "undefined",
+        Null: "null",
         Object: "Object",
         String: "string"
     };
