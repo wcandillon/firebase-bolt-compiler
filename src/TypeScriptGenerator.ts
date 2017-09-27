@@ -117,7 +117,7 @@ export default class TypeScriptGenerator {
 
     private serializeSchema(name: string, schema: Schema): string {
         if (this.derivesFromMap(schema.derivedFrom as ExpGenericType)) {
-            return `type ${name} = ${this.serializeGenericType(schema.derivedFrom as ExpGenericType)};`;
+            return `export type ${name} = ${this.serializeGenericType(schema.derivedFrom as ExpGenericType)};`;
         } else if (!this.derivesFromAtomic(schema.derivedFrom as ExpSimpleType)) {
             return `export interface ${name} ${this.derives(schema)}{
 ${
