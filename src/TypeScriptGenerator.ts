@@ -13,7 +13,7 @@ export default class TypeScriptGenerator {
         Any: "any",
         Boolean: "boolean",
         Number: "number",
-        Null: "null",
+        Null: "void",
         Object: "Object",
         String: "string"
     };
@@ -73,7 +73,7 @@ export default class TypeScriptGenerator {
     }
 
     private serializeUnionType(type: ExpUnionType): string {
-        return type.types.map(t => this.serialize(t)).join(" | ");
+        return type.types.map(t => this.serialize(t)).filter(t => t !== "void").join(" | ");
     }
 
     private serializeGenericType(type: ExpGenericType): string {
@@ -117,14 +117,14 @@ export default class TypeScriptGenerator {
         }
     }
 
-    /*
-    private optionalMark(type: ExpType): string {
-        if (type.name || !type.params) {
-
+    private isNullable(type: ExpType): string {
+        const union = type as ExpUnionType;
+        if (union.types) {
+            const isNullable = _.some(union.types, (t: ExpSimpleType) => t.name === "Null");
+            return isNullable ? "?" : "";
         }
         return "";
     }
-    */
 
     private serializeSchema(name: string, schema: Schema): string {
         if (this.derivesFromMap(schema.derivedFrom as ExpGenericType)) {
@@ -134,7 +134,7 @@ export default class TypeScriptGenerator {
 ${
                 _.map(
                     schema.properties,
-                    (property, propertyName) => `    ${propertyName}: ${this.serialize(property)};`
+                    (prop, propName) => `    ${propName}${this.isNullable(prop)}: ${this.serialize(prop)};`
                 ).join("\n")
 }
 }`;
