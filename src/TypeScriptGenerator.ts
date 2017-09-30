@@ -13,7 +13,7 @@ export default class TypeScriptGenerator {
         Any: "any",
         Boolean: "boolean",
         Number: "number",
-        Null: "undefined",
+        Null: "null",
         Object: "Object",
         String: "string"
     };
@@ -85,7 +85,9 @@ export default class TypeScriptGenerator {
     }
 
     private serializeGenericTypeRef(type: ExpGenericType): string {
-        return `${this.serializeTypeName(type.name)}<${type.params.map(param => this.serialize(param)).join(", ")}>`;
+        const typeName = this.serializeTypeName(type.name);
+        const params = type.params.map(param => this.serialize(param)).join(", ");
+        return `${typeName}<${params}>`;
     }
 
     private serializeRef(type: ExpType): string {
@@ -115,6 +117,15 @@ export default class TypeScriptGenerator {
         }
     }
 
+    /*
+    private optionalMark(type: ExpType): string {
+        if (type.name || !type.params) {
+
+        }
+        return "";
+    }
+    */
+
     private serializeSchema(name: string, schema: Schema): string {
         if (this.derivesFromMap(schema.derivedFrom as ExpGenericType)) {
             return `export type ${name} = ${this.serializeGenericType(schema.derivedFrom as ExpGenericType)};`;
@@ -123,8 +134,9 @@ export default class TypeScriptGenerator {
 ${
                 _.map(
                     schema.properties,
-                    (property, propertyName) => `    ${propertyName}: ${this.serialize(property)};`).join("\n")
-                }
+                    (property, propertyName) => `    ${propertyName}: ${this.serialize(property)};`
+                ).join("\n")
+}
 }`;
         } else {
             return "";
