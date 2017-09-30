@@ -120,7 +120,7 @@ export default class TypeScriptGenerator {
     private isNullable(type: ExpType): string {
         const union = type as ExpUnionType;
         if (union.types) {
-            const isNullable = _.some(union.types, t => (t as ExpSimpleType).name === "Null");
+            const isNullable = _.some(union.types, (t: ExpSimpleType) => t.name === "Null");
             return isNullable ? "?" : "";
         }
         return "";
