@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 const updateNotifier = require("update-notifier");
 const pkg = require("../package.json");
-
 updateNotifier({packageName: pkg.name, packageVersion: pkg.version}).notify();
 require("../build/cli/main.js");
