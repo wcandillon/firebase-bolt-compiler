@@ -34,7 +34,7 @@ export default class FirestoreGenerator {
         const url = path.template.parts.map(
             part => part.variable ? `{${part.variable}}` : part.label
         ).join("/");
-        return `match ${url} {
+        return `match /${url} {
             allow read: if ${this.serializeExp(path.methods.read.body)};
             allow write: if ${this.serializeExp(path.methods.write.body)};
 }`;
