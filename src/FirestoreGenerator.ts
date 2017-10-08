@@ -1,10 +1,14 @@
 import * as _ from "lodash";
 
 import {
-    Path, Exp, Schemas, ExpType, ExpGenericType, ExpOp, ExpUnionType, ExpSimpleType, ExpCall, Schema, Method, ExpReference, ExpVariable, ExpValue, Functions
+    Path, Exp, Schemas, ExpType, ExpGenericType, ExpOp, ExpUnionType, ExpSimpleType, ExpCall, Schema, Method,
+    ExpReference, ExpVariable, ExpValue, Functions
 } from "firebase-bolt";
 
 type NamedType = ExpSimpleType | ExpGenericType;
+
+const isIdentifierStringExp = (exp: Exp) =>
+    exp.type === "String" && /^[a-zA-Z_$][a-zA-Z0-9_]*$/.test((exp as ExpValue).value);
 
 export default class FirestoreGenerator {
 
@@ -55,6 +59,11 @@ export default class FirestoreGenerator {
             return (expr as ExpValue).value;
         } else if (expr.type === "ref") {
             const ref = expr as ExpReference;
+            if (isIdentifierStringExp(ref.accessor)) {
+                return this.serializeExp(ref.base) + "." + (ref.accessor as ExpValue).value;
+            } else {
+                return `${this.serializeExp(ref.base)}[${this.serializeExp(ref.accessor)}]`;
+            }
             /*
             if (isIdentifierStringExp(expRef.accessor)) {
                 result = decodeExpression(expRef.base, innerPrecedence) + '.' + (<ExpValue> expRef.accessor).value;
@@ -63,7 +72,6 @@ export default class FirestoreGenerator {
                     '[' + decodeExpression(expRef.accessor) + ']';
             }
             */
-            return this.serializeExp(ref.base) + "." + this.serializeExp(ref.accessor);
         } else if (expr.type === "var") {
             return (expr as ExpVariable).name;
         } else if (expr.type === "op") {
