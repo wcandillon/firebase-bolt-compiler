@@ -15,10 +15,17 @@ yarn install firebase-bolt-compiler
 
 ## Usage
 
+To generate TypeScript:
+
 ```bash
 firebase-bolt-compiler < rules.bolt
 ```
 
+To generate Flow:
+
+```bash
+firebase-bolt-compiler --flow < rules.bolt
+```
 
 ## Example
 
