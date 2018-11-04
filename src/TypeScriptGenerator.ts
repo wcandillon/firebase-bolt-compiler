@@ -73,7 +73,9 @@ export default class TypeScriptGenerator {
     }
 
     private serializeUnionType(type: ExpUnionType): string {
-        return type.types.map(t => this.serialize(t)).filter(t => t !== "void").join(" | ");
+        const types = type.types.map(t => this.serialize(t));
+        const uniqueTypes = [...new Set(types)];
+        return uniqueTypes.filter(t => t !== "void").join(" | ");
     }
 
     private serializeGenericType(type: ExpGenericType): string {
