@@ -1,0 +1,94 @@
+path /studios/{sid} is Studio {
+  read() { true }
+  write() { isOwner(this) }
+}
+
+path /users/{uid} is User {
+  read() { true }
+  write() { isCurrentUser(uid) }
+}
+
+path /stripe/{uid} is Object {
+  read() { false }
+  write() { false }
+}
+
+type Studio {
+    info: StudioInfo;
+    recurringEvents: RecurringEvents;
+    calendar: Map<Year, Map<Month, Map<Day, Event[]>>>;
+    participants: Map<String, Map<String, Boolean>>;
+}
+
+type StudioInfo {
+    name: String,
+    description: String;
+    owners: Boolean[];
+    stripeId: String;
+}
+
+type BaseEvent {
+    name: String;
+    description: String;
+    picture: String;
+    duration: PositiveNumber;
+    //prices: Prices[];
+}
+
+type Event extends BaseEvent {
+    time: Number;
+}
+
+type RecurringEvents extends RecurringEvent[] {}
+
+type RecurringEvent extends BaseEvent {
+    repeats: Frequency;
+    every: PositiveNumber;
+    starts: PositiveNumber;
+    ends: PositiveNumber | Null;
+    dates: Date[];
+    except: PositiveNumber[];
+}
+
+type Date {
+    weekDay: PositiveNumber;
+    hour: Number;
+    minute: Number;
+}
+
+type User {
+  firstName: String;
+  lastName: String;
+  owns: String;
+}
+
+type Location {
+  latitude: Number;
+  longitude: Number;
+}
+
+type Year extends String {
+    validate() { return this >= 2017  }
+}
+
+type Month extends String {
+    validate() { return this >= 1 && this <= 12 }
+}
+
+type Day extends String {
+    validate() { return this >= 1 && this <= 31 }
+}
+
+type Frequency extends String {
+    validate() {
+        return this == "weekly"
+    }
+}
+
+type PositiveNumber extends Number {
+    validate() { return this >= 1 }
+}
+
+isAuthenticated() { request.auth != null }
+isCurrentUser(uid) { request.auth != null && request.auth.uid == uid }
+isOwner() { request.auth.uid in resource.data.owners }
